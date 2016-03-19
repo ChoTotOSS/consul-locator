@@ -14,6 +14,7 @@
     "log4js": "^0.6.31",
     "pg": "^4.4.6",
     "pg-hstore": "^2.3.2",
-    "sequelize": "^3.19.2"
+    "sequelize": "^3.19.2",
+    "consul-locator": "^1.0.1"
   }
 }

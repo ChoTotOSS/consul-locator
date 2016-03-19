@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "consul": "^0.24.0",
-    "log4js": "^0.6.33"
+    "log4js": "^0.6.33",
+    "sequelize": "^3.19.3"
   }
 }
