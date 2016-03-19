@@ -19,14 +19,14 @@ var exorcism = (options) => {
       })
 
       watch.on('change', (data) => {
-        logger.info('Service has been changed')
+        logger.debug('Service has been changed')
         callback(data)
       });
 
       watch.on('err', (err) => { throw err })
     }
 
-    watchKey(key, callback) {
+    subscribe(key, callback) {
       var self = this
       if (!self.kv) self.kv = {}
       var watch = consul.watch({
