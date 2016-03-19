@@ -1,10 +1,9 @@
 
 "use strict"
-var consul = require('consul')();
 var logger = require('log4js').getLogger();
 
-var exorcism = (consulHost, consulPort) => {
-  var consul = require('consul')({host: consulHost, port: consulPort});
+var exorcism = (options) => {
+  var consul = require('consul')(options);
 
   class Service {
     constructor(name) {
@@ -52,23 +51,8 @@ var exorcism = (consulHost, consulPort) => {
     }
 
   }
-
-
-
   return Service
 }
-
-var Serv = exorcism()
-
-var service = new Serv('hello-world');
-service.watch((data) => {
-  console.log(data);
-})
-
-service.watchKey('blah', (value) => {
-  logger.debug(`Key has been changed`)
-  console.log(value)
-})
 
 module.exports = {
   serviceFor: exorcism
