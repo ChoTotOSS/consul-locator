@@ -1,0 +1,21 @@
+{
+  "name": "consul-locator",
+  "version": "1.0.0",
+  "description": "Come, resounding perception! The locator!",
+  "main": "index.js",
+  "scripts": {
+    "test": "test.js"
+  },
+  "keywords": [
+    "consul",
+    "locator",
+    "services",
+    "discovery"
+  ],
+  "author": "Thinh \"Adolf Weismann\" Tran",
+  "license": "ISC",
+  "dependencies": {
+    "consul": "^0.24.0",
+    "log4js": "^0.6.33"
+  }
+}
