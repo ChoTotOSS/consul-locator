@@ -1,6 +1,6 @@
 # consul-locator
 
-This is consul wrapper for discovery and service change.
+This is consul wrapper for discovery and detect a service changed.
 
 Usage:
 
