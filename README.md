@@ -20,9 +20,15 @@ Options
 * promisify (Boolean|Function, optional): convert callback methods to promises
 
 
-### Service(serviceName)
+### Service(serviceOptions)
 
 Discovery a service
+
+Options
+
+* service (String): service name
+* dc (String, optional): datacenter (defaults to local for agent)
+* tag (String, optional): filter by tag
 
     var service = new Service('hello-world')
 
@@ -63,3 +69,10 @@ Get service by circular
 Check is services list is empty
 
     services.isEmpty()
+
+#### Iterator over services
+
+    
+    for(var service of services) {
+      console.log(service)
+    }

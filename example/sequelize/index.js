@@ -7,7 +7,7 @@ var service = new Service('postgres')
 models = {}
 service.watch((services) => {
   if (!services.isEmpty()) {
-    var postgres = services.get()
+    var postgres = services.next()
     var sequelize = new Sequelize('testdb', 'postgres', 'khongbiet', {
       host: postgres.ServiceAddress,
       port: postgres.ServicePort,

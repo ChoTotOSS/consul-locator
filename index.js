@@ -4,17 +4,20 @@ var logger = require('log4js').getLogger();
 class ServiceFactory {
   constructor(data) {
     this.data = data
-    this.index = 0
+    this.index = -1
   }
 
-  get() {
-    var currentIndex = this.index
-    this.index = this.index++ % this.data.length
-    return this.data[currentIndex]
+  next() {
+    this.index = ++this.index % this.data.length
+    return this.data[this.index]
   }
 
   isEmpty() {
     return this.data.length < 1
+  }
+
+  [Symbol.iterator]() {
+    return new ArrayIterator(this.data)
   }
 }
 
