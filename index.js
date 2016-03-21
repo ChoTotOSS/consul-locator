@@ -1,6 +1,22 @@
-
 "use strict"
 var logger = require('log4js').getLogger();
+
+class ServiceFactory {
+  constructor(data) {
+    this.data = data
+    this.index = 0
+  }
+
+  get() {
+    var currentIndex = this.index
+    this.index = this.index++ % this.data.length
+    return this.data[currentIndex]
+  }
+
+  isEmpty() {
+    return this.data.length < 1
+  }
+}
 
 var exorcism = (options) => {
   var consul = require('consul')(options);
@@ -20,7 +36,8 @@ var exorcism = (options) => {
 
       watch.on('change', (data) => {
         logger.debug('Service has been changed')
-        callback(data)
+        var services = new ServiceFactory(data)
+        callback(services)
       });
 
       watch.on('err', (err) => { throw err })

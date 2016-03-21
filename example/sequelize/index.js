@@ -5,11 +5,12 @@ var Service = require('../../index').serviceFor({host:'192.168.99.100'})
 
 var service = new Service('postgres')
 models = {}
-service.watch((data) => {
-  if (data.length > 0) {
+service.watch((services) => {
+  if (!services.isEmpty()) {
+    var postgres = services.get()
     var sequelize = new Sequelize('testdb', 'postgres', 'khongbiet', {
-      host: data[0].ServiceAddress,
-      port: data[0].ServicePort,
+      host: postgres.ServiceAddress,
+      port: postgres.ServicePort,
       dialect: 'postgres',
     })
     require('fs').readdirSync(root).forEach(function(file) {
@@ -19,7 +20,7 @@ service.watch((data) => {
       }
     })
   } else {
-    console.log('NO DATA')
+    console.warn('Service has been down')
   }
 })
 

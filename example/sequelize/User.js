@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize');
 
 module.exports = (sequelize) => {
-  console.log('define a new model')
+  console.log('Define User model')
   return sequelize.define('user', {
     firstName: {
       type: Sequelize.STRING,

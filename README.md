@@ -32,9 +32,9 @@ Methods:
 
 #### watch(callback)
 
-    sevice.watch((data) => {
+    sevice.watch((services) => {
         //Do with changed data
-        console.log(data)
+        console.log(services.get())
     })
 
 #### subscribe(key, callback)
@@ -43,3 +43,23 @@ Methods:
       // Do something with changed value of key `hello/tcp/port`
       console.log(`tcp port has been changed to ${value}`)
     });
+
+### ServiceFactory(serviceData)
+
+#### get()
+
+Get service by circular
+
+
+    /*
+     * services = [10.0.0.1:123, 10.0.0.2:234]
+     *
+     */
+    services.get() // 10.0.0.1:123
+    services.get() // 10.0.0.2:234
+
+#### isEmpty()
+
+Check is services list is empty
+
+    services.isEmpty()
