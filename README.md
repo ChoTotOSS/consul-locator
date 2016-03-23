@@ -40,7 +40,7 @@ Methods:
 
     sevice.watch((services) => {
         //Do with changed data
-        console.log(services.get())
+        console.log(services.next())
     })
 
 #### subscribe(key, callback)
@@ -52,7 +52,7 @@ Methods:
 
 ### ServiceFactory(serviceData)
 
-#### get()
+#### next()
 
 Get service by circular
 
@@ -61,8 +61,8 @@ Get service by circular
      * services = [10.0.0.1:123, 10.0.0.2:234]
      *
      */
-    services.get() // 10.0.0.1:123
-    services.get() // 10.0.0.2:234
+    services.next() // 10.0.0.1:123
+    services.next() // 10.0.0.2:234
 
 #### isEmpty()
 
