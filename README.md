@@ -1,5 +1,7 @@
 # consul-locator
 
+For the older version, check docs at [1.0.3 docs](https://github.com/duythinht/consul-locator/tree/1.0.3)
+
 This is consul wrapper for discovery and detect a service changed.
 
 Usage:
@@ -79,6 +81,7 @@ Check is services list is empty
       console.log(service)
     }
 
+### Discover helpers
 
 #### locator.inject
 
