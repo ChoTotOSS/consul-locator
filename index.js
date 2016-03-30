@@ -1,5 +1,8 @@
 "use strict"
 var logger = require('log4js').getLogger();
+var async = require('async');
+var request = require('request');
+var extend = require('extend')
 
 class ServiceFactory {
   constructor(data) {
@@ -21,8 +24,11 @@ class ServiceFactory {
   }
 }
 
-var exorcism = (options) => {
-  var consul = require('consul')(options);
+var consul = null
+var watched = {}
+var nodes = {}
+
+module.exports = () => {
 
   class Service {
     constructor(name) {
@@ -30,6 +36,8 @@ var exorcism = (options) => {
     }
 
     watch(callback) {
+      var self = this
+      logger.info(`Discover for service '${this.name}'`)
       var watch = consul.watch({
         method: consul.catalog.service.nodes,
         options: {
@@ -38,7 +46,7 @@ var exorcism = (options) => {
       })
 
       watch.on('change', (data) => {
-        logger.debug('Service has been changed')
+        logger.debug(`Service ${self.name} has been changed`)
         var services = new ServiceFactory(data)
         callback(services)
       });
@@ -49,7 +57,7 @@ var exorcism = (options) => {
     subscribe(key, callback) {
       var self = this
       if (!self.kv) self.kv = {}
-      var watch = consul.watch({
+     var watch = consul.watch({
         method: consul.kv.get,
         options: {
           key: key
@@ -69,11 +77,79 @@ var exorcism = (options) => {
         logger.error(`Failure to get key '${key}' is not exists`)
       })
     }
-
   }
-  return Service
-}
 
-module.exports = {
-  serviceFor: exorcism
-}
+  var use = (options) => {
+    consul = require('consul')(options)
+  }
+
+  var $http = (uri, options) => {
+    var service = uri.match(/service:\/\/([a-zA-Z|-]*)/)[1]
+    return new Promise((resolve, reject) => {
+      inject([service, ($service) => {
+        if (!$service) {
+          logger.warn(`Service ${service} is missing`)
+          return reject(`Service ${service} is missing`)
+        }
+        uri = uri.replace(/service:\/\/([a-zA-Z|-]*)/, `http://${$service.ServiceAddress}:${$service.ServicePort}`)
+        var params = request.initParams(uri, options, (err, resp, body) => {
+          if (err) return reject(err)
+          return resolve({status: resp.statusCode, response: resp, body: body})
+        })
+        new request.Request(params)
+      }])
+    })
+  }
+
+  var methods = ['get', 'head', 'post', 'put', 'patch', 'del']
+
+  for (var method of methods) {
+    $http[method] = ((method) => {
+      var method = method === 'del' ? 'DELETE' : method.toUpperCase()
+      return (uri, options) => {
+        options = extend(options, {method: method})
+        return $http(uri, options)
+      }
+    })(method)
+  }
+
+
+
+  var inject = (args) => {
+    if (!Array.isArray(args)) {
+      throw "Wrong args list"
+    } else if (typeof args[args.length - 1] !== 'function') {
+      throw `Missing injected Function`
+    }
+
+    var serviceList = args.slice(0, args.length - 1)
+    var next = args[args.length - 1]
+
+    for (var serviceName of serviceList) {
+      if (!(serviceName in watched)) {
+        var service = new Service(serviceName)
+        service.watch((services) => {
+          nodes[serviceName] = services
+        })
+        watched[serviceName] = true
+      }
+    }
+
+    async.map(serviceList, (serviceName, next) => {
+      async.retry({times: 10, interval: 200}, (next) => {
+        try {
+          next(null, nodes[serviceName].next())
+        } catch (e) {
+          next(e);
+        }
+      }, next)
+    }, (err, results) => next.apply(err, results))
+  }
+
+  return {
+    Service: Service,
+    inject: inject,
+    use: use,
+    $http: $http
+  }
+}()

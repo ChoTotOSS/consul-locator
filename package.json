@@ -1,6 +1,6 @@
 {
   "name": "consul-locator",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Come, resounding perception! The locator!",
   "main": "index.js",
   "scripts": {
@@ -15,8 +15,10 @@
   "author": "Thinh \"Adolf Weismann\" Tran",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.0.0-rc.2",
     "consul": "^0.24.0",
     "log4js": "^0.6.33",
+    "request": "^2.69.0",
     "sequelize": "^3.19.3"
   }
 }
