@@ -84,20 +84,36 @@ module.exports = () => {
   }
 
   var $http = (uri, options) => {
-    var service = uri.match(/service:\/\/([a-zA-Z|-]*)/)[1]
     return new Promise((resolve, reject) => {
-      inject([service, ($service) => {
-        if (!$service) {
-          logger.warn(`Service ${service} is missing`)
-          return reject(`Service ${service} is missing`)
+      async.waterfall([
+        (next) => {
+          var serviceMatched = uri.match(/service:\/\/([a-zA-Z|-]*)/)
+          next(null, serviceMatched)
+        },
+        (serviceMatched, next) => {
+          if (!serviceMatched) {
+            return next(null, uri)
+          }
+          inject([serviceMatched[1], ($service) => {
+            var url = uri.replace(/service:\/\/([a-zA-Z|-]*)/, `http://${$service.ServiceAddress}:${$service.ServicePort}`)
+            if (!$service) {
+              return next(`Service ${serviceMatched[1]} is missing`)
+            }
+            next(null, url)
+          }])
+        },
+        (url, next) => {
+          console.log(url)
+          var params = request.initParams(url, options, (err, resp, body) => {
+            if (err) return next(err)
+            next(null, {status: resp.statusCode, response: resp, body: body})
+          })
+          new request.Request(params)
         }
-        uri = uri.replace(/service:\/\/([a-zA-Z|-]*)/, `http://${$service.ServiceAddress}:${$service.ServicePort}`)
-        var params = request.initParams(uri, options, (err, resp, body) => {
-          if (err) return reject(err)
-          return resolve({status: resp.statusCode, response: resp, body: body})
-        })
-        new request.Request(params)
-      }])
+      ], (err, result) => {
+        if (err) return reject(err)
+        resolve(result)
+      })
     })
   }
 
