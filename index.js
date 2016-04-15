@@ -34,6 +34,9 @@ module.exports = () => {
   class Service {
     constructor(name) {
       this.name = name
+      if (!consul) {
+        throw `Misisng consul info, locator.use please`
+      }
     }
 
     watch(callback) {
