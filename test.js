@@ -1,4 +1,5 @@
-var Service = require('./index.js').serviceFor()
+require('./index').use()
+var Service = require('./index.js').Service
 var consul = require('consul')()
 var expect = require('chai').expect
 var logger = require('log4js').getLogger()

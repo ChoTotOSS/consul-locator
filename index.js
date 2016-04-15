@@ -35,7 +35,7 @@ module.exports = () => {
     constructor(name) {
       this.name = name
       if (!consul) {
-        throw `Misisng consul info, locator.use please`
+        throw `Misisng consul info, run locator.use please`
       }
     }
 
