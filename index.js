@@ -11,6 +11,7 @@ class ServiceFactory {
   }
 
   next() {
+    if (this.isEmpty()) return null
     this.index = ++this.index % this.data.length
     return this.data[this.index]
   }
@@ -95,15 +96,14 @@ module.exports = () => {
             return next(null, uri)
           }
           inject([serviceMatched[1], ($service) => {
-            var url = uri.replace(/service:\/\/([a-zA-Z|-]*)/, `http://${$service.ServiceAddress}:${$service.ServicePort}`)
             if (!$service) {
               return next(`Service ${serviceMatched[1]} is missing`)
             }
+            var url = uri.replace(/service:\/\/([a-zA-Z|-]*)/, `http://${$service.ServiceAddress}:${$service.ServicePort}`)
             next(null, url)
           }])
         },
         (url, next) => {
-          console.log(url)
           var params = request.initParams(url, options, (err, resp, body) => {
             if (err) return next(err)
             next(null, {status: resp.statusCode, response: resp, body: body})
@@ -140,7 +140,6 @@ module.exports = () => {
 
     var serviceList = args.slice(0, args.length - 1)
     var next = args[args.length - 1]
-
     for (var serviceName of serviceList) {
       if (!(serviceName in watched)) {
         var service = new Service(serviceName)
@@ -154,12 +153,13 @@ module.exports = () => {
     async.map(serviceList, (serviceName, next) => {
       async.retry({times: 10, interval: 200}, (next) => {
         try {
-          next(null, nodes[serviceName].next())
+          var node = nodes[serviceName].next()
+          next(null, node)
         } catch (e) {
           next(e);
         }
       }, next)
-    }, (err, results) => next.apply(err, results))
+    }, (err, results) => next.apply(null, results))
   }
 
   return {
