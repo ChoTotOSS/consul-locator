@@ -1,9 +1,10 @@
 var Sequelize = require('sequelize');
 var path = require('path');
 var root = path.dirname(require.main.filename);
-var Service = require('../../index').serviceFor({host:'192.168.99.100'})
+var locator = require('../../index')
+locator.use({host:'192.168.99.100'})
 
-var service = new Service('postgres')
+var service = new locator.Service('postgres')
 models = {}
 service.watch((services) => {
   if (!services.isEmpty()) {
