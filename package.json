@@ -1,6 +1,6 @@
 {
   "name": "consul-locator",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Come, resounding perception! The locator!",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,13 @@
     "services",
     "discovery"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ChoTotOSS/consul-locator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChoTotOSS/consul-locator/issues"
+  },
   "author": "Thinh \"Adolf Weismann\" Tran",
   "license": "ISC",
   "dependencies": {
