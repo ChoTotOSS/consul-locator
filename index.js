@@ -37,20 +37,21 @@ module.exports = () => {
       if (!consul) {
         throw `Misisng consul info, run locator.use please`
       }
+      this.consul = consul
     }
 
     watch(callback) {
       var self = this
       logger.info(`Discover for service '${this.name}'`)
-      var watch = consul.watch({
-        method: consul.catalog.service.nodes,
+      var watch = this.consul.watch({
+        method: this.consul.catalog.service.nodes,
         options: {
           service: this.name
         }
       })
 
       watch.on('change', (data) => {
-        logger.debug(`Service ${self.name} has been changed`)
+        logger.debug(`Service ${self.name} has been changed`, data)
         var services = new ServiceFactory(data)
         callback(services)
       });
@@ -61,8 +62,8 @@ module.exports = () => {
     subscribe(key, callback) {
       var self = this
       if (!self.kv) self.kv = {}
-     var watch = consul.watch({
-        method: consul.kv.get,
+     var watch = this.consul.watch({
+        method: this.consul.kv.get,
         options: {
           key: key
         }
