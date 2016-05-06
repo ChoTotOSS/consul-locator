@@ -3,6 +3,7 @@ var logger = require('log4js').getLogger();
 var async = require('async');
 var request = require('request');
 var extend = require('extend')
+var urllib = require('url')
 
 class ServiceFactory {
   constructor(data) {
@@ -29,7 +30,7 @@ var consul = null
 var watched = {}
 var nodes = {}
 
-module.exports = () => {
+module.exports = (() => {
 
   class Service {
     constructor(name) {
@@ -92,22 +93,23 @@ module.exports = () => {
     return new Promise((resolve, reject) => {
       async.waterfall([
         (next) => {
-          var serviceMatched = uri.match(/service:\/\/([a-zA-Z|-]*)/)
-          next(null, serviceMatched)
+          var uriObj = urllib.parse(uri)
+          next(null, uriObj)
         },
-        (serviceMatched, next) => {
-          if (!serviceMatched) {
+        (uriObj, next) => {
+          if (uriObj.protocol != 'service:') {
             return next(null, uri)
           }
-          inject([serviceMatched[1], ($service) => {
+          inject([uriObj.host, ($service) => {
             if (!$service) {
-              return next(`Service ${serviceMatched[1]} is missing`)
+              return next(`Service ${uriObj.host} is missing`)
             }
-            var url = uri.replace(/service:\/\/([a-zA-Z|-]*)/, `http://${$service.ServiceAddress}:${$service.ServicePort}`)
+            var url = `http://${$service.ServiceAddress}:${$service.ServicePort}${uriObj.path}`
             next(null, url)
           }])
         },
         (url, next) => {
+          logger.debug(`Make a request to ${url}`)
           var params = request.initParams(url, options, (err, resp, body) => {
             if (err) return next(err)
             next(null, {status: resp.statusCode, response: resp, body: body})
@@ -172,4 +174,4 @@ module.exports = () => {
     use: use,
     $http: $http
   }
-}()
+})()
