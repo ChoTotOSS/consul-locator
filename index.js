@@ -45,9 +45,10 @@ module.exports = (() => {
       var self = this
       logger.info(`Discover for service '${this.name}'`)
       var watch = this.consul.watch({
-        method: this.consul.catalog.service.nodes,
+        method: this.consul.health.service,
         options: {
-          service: this.name
+          service: this.name,
+          passing: true
         }
       })
 
@@ -104,7 +105,7 @@ module.exports = (() => {
             if (!$service) {
               return next(`Service ${uriObj.host} is missing`)
             }
-            var url = `http://${$service.ServiceAddress}:${$service.ServicePort}${uriObj.path}`
+            var url = `http://${$service.Service.Address}:${$service.Service.Port}${uriObj.path}`
             next(null, url)
           }])
         },
