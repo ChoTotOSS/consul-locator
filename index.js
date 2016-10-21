@@ -1,9 +1,11 @@
 "use strict"
-var logger = require('log4js').getLogger();
+var logger = require('log4js').getLogger('consul');
 var async = require('async');
 var request = require('request');
 var extend = require('extend')
 var urllib = require('url')
+
+logger.setLevel(process.env.CONSUL_LOCATOR || 'INFO')
 
 class ServiceFactory {
   constructor(data) {
