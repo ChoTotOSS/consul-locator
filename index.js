@@ -100,6 +100,10 @@ module.exports = (() => {
           next(null, uriObj)
         },
         (uriObj, next) => {
+          if (!consul) {
+            return next(null, uri.replace('service:', 'http:'))
+          }
+
           if (uriObj.protocol != 'service:') {
             return next(null, uri)
           }
